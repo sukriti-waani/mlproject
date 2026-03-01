@@ -2,7 +2,7 @@
 # sys module helps us access system-specific parameters and functions
 # We use it here to get detailed exception information
 import sys
-import logging
+from src.logger import logging
 
 # This function creates a detailed error message
 # error → actual error object/message
