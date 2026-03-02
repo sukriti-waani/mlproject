@@ -57,6 +57,8 @@ import pandas as pd
 from src.exception import CustomException
 # Custom exception class used to handle errors properly
 
+from sklearn.metrics import r2_score
+
 
 # ==============================================================
 # Function: save_object
@@ -107,6 +109,83 @@ def save_object(file_path, obj):
         raise CustomException(e, sys)
     
     
+def evaluate_models(X_train, y_train, X_test, y_test, models):
+    # This function evaluates multiple ML models.
+    # It takes:
+    # X_train → Training input features
+    # y_train → Training target values
+    # X_test → Testing input features
+    # y_test → Testing target values
+    # models → Dictionary of model_name : model_object
+    
+    try:
+        # Try block is used to catch any errors during model training or evaluation
+        
+        report = {}
+        # Creating an empty dictionary
+        # This will store model name and its test score
+        # Example:
+        # report = {
+        #     "Random Forest": 0.85,
+        #     "Linear Regression": 0.78
+        # }
+
+        for model_name, model in models.items():
+            # Looping through dictionary of models
+            # model_name → name of model (string)
+            # model → actual ML model object
+            # Example:
+            # model_name = "Random Forest"
+            # model = RandomForestRegressor()
+
+            
+            # Train model
+            model.fit(X_train, y_train)
+            # .fit() trains the model using training data
+            # The model learns patterns from X_train and y_train
+
+
+            # Predictions
+            y_train_pred = model.predict(X_train)
+            # Model predicts output for training data
+            # Used to check how well model learned training data
+
+            y_test_pred = model.predict(X_test)
+            # Model predicts output for test data
+            # This shows how well model performs on unseen data
+
+
+            # Scores
+            train_model_score = r2_score(y_train, y_train_pred)
+            # Calculating R2 score for training data
+            # R2 score measures how good predictions are
+            # Value range:
+            # 1 → Perfect prediction
+            # 0 → Average model
+            # Negative → Poor model
+
+            test_model_score = r2_score(y_test, y_test_pred)
+            # Calculating R2 score for test data
+            # Test score is more important because it checks real performance
+
+
+            report[model_name] = test_model_score
+            # Storing test score in dictionary
+            # Key = model name
+            # Value = test R2 score
+
+
+        return report
+        # After loop finishes,
+        # Return dictionary containing all models and their scores
+
+
+    except Exception as e:
+        # If any error occurs during training or evaluation
+        
+        raise CustomException(e, sys)
+        # Raise your custom exception
+        # Helps track detailed error in ML pipeline
     
     
     
