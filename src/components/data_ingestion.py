@@ -20,6 +20,8 @@ from src.exception import CustomException  # Your custom error handling class
 
 from src.logger import logging  # Your logging file to print execution messages
 
+from src.components.data_transformation import DataTransformation
+from src.components.data_transformation import DataTransformationConfig
 
 
 @dataclass
@@ -138,11 +140,32 @@ class DataIngestion:
             # This helps in better error tracking in ML pipeline
             
             
+# This condition checks:
+# If this file is being executed directly
+# Then run the code below
 if __name__ == "__main__":
-    obj = DataIngestion()
-    obj.initiate_data_ingestion()
     
-
+    # Creating object of DataIngestion class
+    # This initializes the ingestion component
+    obj = DataIngestion()
+    
+    # Calling the method to perform data ingestion
+    # It reads dataset, splits into train/test,
+    # saves files, and returns file paths
+    train_data, test_data = obj.initiate_data_ingestion()
+    
+    
+    # Creating object of DataTransformation class
+    # This initializes transformation component
+    data_transformation = DataTransformation()
+    
+    # Calling transformation method
+    # It:
+    # 1. Reads train and test CSV files
+    # 2. Applies preprocessing (imputation, encoding, scaling)
+    # 3. Saves preprocessing object
+    # 4. Returns transformed arrays
+    data_transformation.initiate_data_transformation(train_data, test_data)
 
 # run the below command in terminal to run this file
 # python -m src.components.data_ingestion
