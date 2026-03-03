@@ -58,6 +58,7 @@ from src.exception import CustomException
 # Custom exception class used to handle errors properly
 
 from sklearn.metrics import r2_score
+from sklearn.model_selection import GridSearchCV
 
 
 # ==============================================================
@@ -109,7 +110,7 @@ def save_object(file_path, obj):
         raise CustomException(e, sys)
     
     
-def evaluate_models(X_train, y_train, X_test, y_test, models):
+def evaluate_models(X_train, y_train, X_test, y_test, models, params):
     # This function evaluates multiple ML models.
     # It takes:
     # X_train → Training input features
@@ -129,21 +130,29 @@ def evaluate_models(X_train, y_train, X_test, y_test, models):
         #     "Random Forest": 0.85,
         #     "Linear Regression": 0.78
         # }
+        
 
-        for model_name, model in models.items():
+        for i in range(len(list(models))):
             # Looping through dictionary of models
             # model_name → name of model (string)
             # model → actual ML model object
             # Example:
             # model_name = "Random Forest"
             # model = RandomForestRegressor()
-
+            
+            model = list(models.values())[i]
+            para = params[list(models.keys())[i]]
             
             # Train model
-            model.fit(X_train, y_train)
+            # model.fit(X_train, y_train)
             # .fit() trains the model using training data
             # The model learns patterns from X_train and y_train
 
+            gs = GridSearchCV(model, para, cv=3)
+            gs.fit(X_train, y_train)
+            
+            model.set_params(**gs.best_params_)
+            model.fit(X_train, y_train)
 
             # Predictions
             y_train_pred = model.predict(X_train)
@@ -169,7 +178,7 @@ def evaluate_models(X_train, y_train, X_test, y_test, models):
             # Test score is more important because it checks real performance
 
 
-            report[model_name] = test_model_score
+            report[list(models.keys())[i]] = test_model_score
             # Storing test score in dictionary
             # Key = model name
             # Value = test R2 score
